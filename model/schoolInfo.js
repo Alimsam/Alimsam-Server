@@ -40,8 +40,6 @@ exports.getMealAndCalendar = async function(year, month, callback) {
             meal[String(date)] = processMeal(meal[String(date)]);
         }
     }
-
-    console.log(meal);
-
+    
     callback(meal, calendar);
 }
