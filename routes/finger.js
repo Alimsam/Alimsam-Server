@@ -6,4 +6,9 @@ router.get('/', function(req, res, next) {
   res.render('finger');
 });
 
+router.post('/request', function(req, res, next) {
+  console.log(req.body);
+  res.redirect('/finger');
+});
+
 module.exports = router;

@@ -7,7 +7,9 @@
     <title>레게노</title>
 </head>
 <body>
-    <input type="text" class="fingerName">
-    <input type="button" value="야발" class="submit">
+    <form method="POST" autocomplete="off" action="http://localhost:3000/finger/request">
+        <input type="text" class="fingerId" name="fingerId">
+        <input type="submit" class="submit" value="제출">
+    </form>
 </body>
 </html>
