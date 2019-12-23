@@ -6,12 +6,18 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "assert": "^2.0.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "ejs": "^3.0.1",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "mongodb": "^3.4.1",
     "morgan": "~1.9.1",
-    "node-school-kr": "^2.2.2"
+    "negotiator": "^0.6.2",
+    "node-school-kr": "^2.2.2",
+    "socket.io": "^2.3.0",
+    "socket.py": "^0.3.1",
+    "ws": "^7.2.1"
   }
 }

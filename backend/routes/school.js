@@ -12,7 +12,7 @@ router.get('/meal', function(req, res, next) {
   const year = String(req.query.year);
   const month = String(req.query.month);
   schoolInfo.getMeal(year, month, function(meal) {
-    res.send({meal: meal});
+    res.json(meal);
   });
 });
 
@@ -21,7 +21,7 @@ router.get('/calendar', function(req, res, next) {
   const year = String(req.query.year);
   const month = String(req.query.month);
   schoolInfo.getCalendar(year, month, function(calendar) {
-    res.send({calendar: calendar});
+    res.json(calendar);
   });
 });
 
