@@ -92,7 +92,7 @@ exports.addBackTime = function(fingerId, callback) {
   );
 }
 
-exports.addOuting = function(outing, callback) {
+exports.addOuting = function(finger, callback) {
   console.log('addOuting 호출됨');
   
   const outing = db.collection('outing');
@@ -101,7 +101,7 @@ exports.addOuting = function(outing, callback) {
   var dayOfWeek = moment.day();
 
   if(dayOfWeek === 1 || dayOfWeek === 3) {
-    const outingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'outTime': outing.outTime, 'comebackTime': '' };
+    const outingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'outTime': outTime, 'comebackTime': '' };
     
     outing.update({ 'date':  date }, { $push: { 'outingData': outingData }},
       function(err, result) {
