@@ -13,7 +13,7 @@ moment.tz.setDefault("Asia/Seoul");
 
 var db;
 // Use connect method to connect to the server
-MongoClient.connect(url, function(err, client) {
+MongoClient.connect(url, {useUnifiedTopology:true}, function(err, client) {
   assert.equal(null, err);
   console.log("DataBase Connected successfully to server");
  
@@ -47,6 +47,16 @@ exports.findFinger = function(fingerId, callback) {    // fingerData Or fingerId
     callback(docs);     // 해당 지문 유저의 이름 callback
   });
 }
+
+
+
+
+
+
+
+
+
+
 
 exports.findOuting = function(date, callback) {
   console.log('findOuting 호출됨');
@@ -98,19 +108,15 @@ exports.addOuting = function(finger, callback) {
   const outing = db.collection('outing');
 
   const date = moment().format('YYYY-MM-DD');
-  var dayOfWeek = moment.day();
 
-  if(dayOfWeek === 1 || dayOfWeek === 3) {
-    const outingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'outTime': outTime, 'comebackTime': '' };
-    
-    outing.update({ 'date':  date }, { $push: { 'outingData': outingData }},
-      function(err, result) {
-        assert.equal(err, null);
-        console.log('외출 데이터 추가 완료');
-        callback(result);
-      }
-    );
-  } else {
-    // 외출 가능한 요일이 아닙니다.
-  }
+  const outingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'outTime': outTime, 'comebackTime': '' };
+  
+  outing.update({})
+  outing.update({ 'date':  date }, { $push: { 'outingData': outingData }},
+    function(err, result) {
+      assert.equal(err, null);
+      console.log('외출 데이터 추가 완료');
+      callback(result);
+    }
+  );
 }
