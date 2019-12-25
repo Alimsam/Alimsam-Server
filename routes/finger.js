@@ -15,11 +15,22 @@ var server = net.createServer(function(socket) {
   });
 
   router.get('/reinput', function(req, res, next) {
-    socket.write('reinput');
+    /* socket.write('reinput');        // 지문 재 입력 */
   });
 });
 
+router.post('/fingerAdd', function(req, res, next) {
+  const fingerId = req.body.fingerId;
+  const fingerData = req.body.fingerData;
+  /* 이름 입력 화면 렌딩(팝업) */
+  /* const name = inputted name*/
+  const finger = { 'fingerId': fingerId, 'name': '테스트', /* 'name': name */ 'fingerData': fingerData };
+  model.addFinger(finger, function() { });                  // 지문 컬렉션에 이름 및 지문 데이터 추가
+  /* 지문 추가 완료 화면 렌딩 (팝업) */
+  res.redirect('/');
+});
+
 server.listen(3300, function() {
-  console.log('socket server listening');
+  console.log('socket server listening\n');
 });
 module.exports = router;

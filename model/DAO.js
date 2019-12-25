@@ -5,7 +5,7 @@ const assert = require('assert');
 const url = 'mongodb://localhost:27017';
 
 // Database Name
-const dbName = 'myproject';
+const dbName = 'Alimsam_DB';
 
 var moment = require('moment');
 require('moment-timezone');
@@ -15,35 +15,38 @@ var db;
 // Use connect method to connect to the server
 MongoClient.connect(url, {useUnifiedTopology:true}, function(err, client) {
   assert.equal(null, err);
-  console.log("DataBase Connected successfully to server");
+  console.log("DataBase Connected successfully to server\n");
  
   db = client.db(dbName);
- 
-  client.close();
 });
 
+
+
+
+
+
 exports.addFinger = function(finger, callback) {
-  console.log('addFinger 호출됨');
+  console.log('addFinger 호출됨\n');
 
   const fingerPrint = db.collection('fingerPrint');       // access fingerPirint collection
 
   fingerPrint.insertMany([{ "fingerId": finger.fingerId, "fingerData": finger.fingerData, "name": finger.name }], 
     function(err, result) {
       assert.equal(err, null);    // err가 null일 경우 pass
-      cosole.log('지문 데이터 추가 완료!');
+      console.log('지문 데이터 추가 완료!\n');
       callback(result);
     }
   );
 }
 
 exports.findFinger = function(fingerId, callback) {    // fingerData Or fingerId
-  console.log('getFInger 호출됨');
+  console.log('findFinger 호출됨\n');
 
   const fingerPrint = db.collection('fingerPrint');
 
   fingerPrint.find({ "fingerId": fingerId }).toArray(function(err, docs) {
     assert.equal(err, null);
-    console.log("유저 탐색 성공!");
+    console.log('유저 탐색 성공!\n');
     callback(docs);     // 해당 지문 유저의 이름 callback
   });
 }
@@ -58,19 +61,19 @@ exports.findFinger = function(fingerId, callback) {    // fingerData Or fingerId
 
 
 
-exports.findOuting = function(date, callback) {
-  console.log('findOuting 호출됨');
+// exports.findOuting = function(date, callback) {
+//   console.log('findOuting 호출됨');
   
-  const outing = db.collection('outing');
+//   const outing = db.collection('outing');
   
-  outing.find({'date': date}).toArray(function(err, docs) {
-    assert.equal(err, null);
-    callback(docs);
-  })
-}
+//   outing.find({'date': date}).toArray(function(err, docs) {
+//     assert.equal(err, null);
+//     callback(docs);
+//   });
+// }
 
 exports.findIsOuting = function(fingerId, callback) {
-  console.log('findOuting 호출됨');
+  console.log('findIsOuting 호출됨\n');
 
   const outing = db.collection('outing');
   
@@ -83,39 +86,61 @@ exports.findIsOuting = function(fingerId, callback) {
     } else {
       callback(false);
     }
-  })
+  });
 }
 
 exports.addBackTime = function(fingerId, callback) {
-  console.log('addBackTime 호출됨');
+  console.log('addBackTime 호출됨\n');
 
   const outing = db.collection('outing');
-
-  var backTime = moment().format('hh:mm');
+  const date = moment().format('YYYY-MM-DD');
+  const backTime = moment().format('hh:mm');
   
-  outing.update({ 'date': date, 'outingData.fingerId': fingerId }, {$set: {'backTime': backTime } }, 
+  outing.updateOne({ 'date': date, 'outingData.fingerId': fingerId }, {$set: {'outingData.$.backTime': backTime } }, 
     function(err, result) {
       assert.equal(err, null);
-      console.log('귀가 시간 추가 완료');
+      console.log('귀가 시간 추가 완료\n');
       callback(result);
     }
   );
 }
 
 exports.addOuting = function(finger, callback) {
-  console.log('addOuting 호출됨');
+  console.log('addOuting 호출됨\n');
   
   const outing = db.collection('outing');
+  const date = moment().format('YYYY-MM-DD');
+  const outTime = moment().format('hh:mm');
+
+  const outingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'outTime': outTime, 'backTime': '' };
+  
+  outing.updateOne({ 'date':  date }, { $push: { 'outingData': outingData }}, { upsert : true }, 
+    function(err, result) {
+      assert.equal(err, null);
+      console.log('외출 데이터 추가 완료\n');
+      callback(result);
+    }
+  );
+}
+
+
+
+
+
+
+exports.addMoving = function(finger, place, callback) {
+  console.log('addMoving 호출됨\n');
+  
+  const moving = db.collection('moving');
 
   const date = moment().format('YYYY-MM-DD');
 
-  const outingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'outTime': outTime, 'comebackTime': '' };
+  const movingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'place': place };
   
-  outing.update({})
-  outing.update({ 'date':  date }, { $push: { 'outingData': outingData }},
+  moving.updateOne({ 'date':  date }, { $push: { 'movingData': movingData }}, { upsert : true }, 
     function(err, result) {
       assert.equal(err, null);
-      console.log('외출 데이터 추가 완료');
+      console.log('이동 데이터 추가 완료\n');
       callback(result);
     }
   );
