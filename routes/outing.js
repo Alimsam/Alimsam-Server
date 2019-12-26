@@ -7,45 +7,55 @@ moment.tz.setDefault("Asia/Seoul");
 
 var model = require('../model/DAO');
 
-router.get('/', function(req, res, next) {
-  res.send('Here is outing router');
-});
+router.get('/fingerInputting', function(req, res, next) {
+  res.send('Here is outing router!');
+})
 
 router.get('/fingerStart', function(req, res, next) {
-  const dayOfWeek = moment.day();
+  const dayOfWeek = moment().day();
 
-  if(dayOfWeek === 1 || dayOfWeek === 3) {            // 월요일이나 수요일 일 경우
-    res.redirect('/finger/fingerStart?method=outing');
-  } else {                                            // 외출 신청이 불가능한 요일
-    res.redirect('/outing/unable');
-  }
+  // if(dayOfWeek === 1 || dayOfWeek === 3) {            // 월요일이나 수요일 일 경우
+  res.redirect('/finger/fingerStart?method=outing');
+  // } else {                                            // 외출 신청이 불가능한 요일
+    // res.redirect('/outing/unable');
+  // }
 });
 
 router.post('/fingerSuccess', function(req, res, next) {
   const fingerSuccess = req.body.fingerSuccess
 
   if(fingerSuccess == 'false') {
-    res.redirect('/finger/reinput');          // 지문 다시 입력하기
+    res.redirect('/finger/fail?method=outing');
   } else {
     const fingerId = req.body.fingerId;
 
     if(fingerSuccess == 'true') {
       model.findFinger(fingerId, function(result) {     // 지문 컬렉션에서 이름 가져오기
-        
         const name = result[0].name
-
         model.findIsOuting(fingerId, function(result) {           // fingerId를 가진 사람이 외출을 신청했는가?
           if(result === true) {                                   // 외출 신청을 한 사람이라면
             model.addBackTime(fingerId, function() { });          // 귀가 시간 추가
           } else {
             const finger = { 'name': name, 'fingerId': fingerId };
-            model.addOuting( finger, function(result) { });  // 외출 컬렉션에 이름 추가
+            model.addOuting( finger, function(result) { });        // 외출 컬렉션에 이름 추가
           }
+          res.redirect('/');
         });
       });
     }
-    res.redirect('/');
   }
+});
+
+router.get('/getOutingList', function(req, res, next) {
+  const date = req.query.date;
+
+  model.getOutingList(date, 
+    function(result) {
+      const outingList = result[0].outingData;
+
+      res.send(outingList);
+    }
+  );
 });
 
 module.exports = router;

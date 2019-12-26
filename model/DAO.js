@@ -13,12 +13,14 @@ moment.tz.setDefault("Asia/Seoul");
 
 var db;
 // Use connect method to connect to the server
-MongoClient.connect(url, {useUnifiedTopology:true}, function(err, client) {
-  assert.equal(null, err);
-  console.log("DataBase Connected successfully to server\n");
- 
-  db = client.db(dbName);
-});
+MongoClient.connect(url, {useUnifiedTopology:true}, 
+  function(err, client) {
+    assert.equal(null, err);
+    console.log("DataBase Connected successfully to server\n");
+
+    db = client.db(dbName);
+  }
+);
 
 
 
@@ -30,7 +32,7 @@ exports.addFinger = function(finger, callback) {
 
   const fingerPrint = db.collection('fingerPrint');       // access fingerPirint collection
 
-  fingerPrint.insertMany([{ "fingerId": finger.fingerId, "fingerData": finger.fingerData, "name": finger.name }], 
+  fingerPrint.insertMany([{ "fingerId": finger.fingerId, "name": finger.name }], 
     function(err, result) {
       assert.equal(err, null);    // err가 null일 경우 pass
       console.log('지문 데이터 추가 완료!\n');
@@ -44,11 +46,13 @@ exports.findFinger = function(fingerId, callback) {    // fingerData Or fingerId
 
   const fingerPrint = db.collection('fingerPrint');
 
-  fingerPrint.find({ "fingerId": fingerId }).toArray(function(err, docs) {
-    assert.equal(err, null);
-    console.log('유저 탐색 성공!\n');
-    callback(docs);     // 해당 지문 유저의 이름 callback
-  });
+  fingerPrint.find({ "fingerId": fingerId }).toArray(
+    function(err, docs) {
+      assert.equal(err, null);
+      console.log('유저 탐색 성공!\n');
+      callback(docs);     // 해당 지문 유저의 이름 callback
+    }
+  );
 }
 
 
@@ -59,19 +63,6 @@ exports.findFinger = function(fingerId, callback) {    // fingerData Or fingerId
 
 
 
-
-
-// exports.findOuting = function(date, callback) {
-//   console.log('findOuting 호출됨');
-  
-//   const outing = db.collection('outing');
-  
-//   outing.find({'date': date}).toArray(function(err, docs) {
-//     assert.equal(err, null);
-//     callback(docs);
-//   });
-// }
-
 exports.findIsOuting = function(fingerId, callback) {
   console.log('findIsOuting 호출됨\n');
 
@@ -79,14 +70,17 @@ exports.findIsOuting = function(fingerId, callback) {
   
   const date = moment().format('YYYY-MM-DD');
 
-  outing.find({'date': date, 'outingData.fingerId': fingerId }).toArray(function(err, docs) {
-    assert.equal(err, null);
-    if(docs.length > 0) {         // 외출 신청을 한 사람이라면
-      callback(true);
-    } else {
-      callback(false);
+  outing.find({'date': date, 'outingData.fingerId': fingerId }).toArray(
+    function(err, docs) {
+      assert.equal(err, null);
+      console.log('외출 유무 확인 완료!\n')
+      if(docs.length > 0) {         // 외출 신청을 한 사람이라면
+        callback(true);
+      } else {
+        callback(false);
+      }
     }
-  });
+  );
 }
 
 exports.addBackTime = function(fingerId, callback) {
@@ -123,6 +117,20 @@ exports.addOuting = function(finger, callback) {
   );
 }
 
+exports.getOutingList = function(date, callback) {
+  console.log('getOutingList 호출됨\n');
+
+  const outing = db.collection('outing');
+
+  outing.find({ 'date': date }).toArray(
+    function(err, docs) {
+      assert.equal(err, null);
+      console.log('외출 데이터 추출완료!\n');
+      callback(docs);
+    }
+  );
+}
+
 
 
 
@@ -142,6 +150,20 @@ exports.addMoving = function(finger, place, callback) {
       assert.equal(err, null);
       console.log('이동 데이터 추가 완료\n');
       callback(result);
+    }
+  );
+}
+
+exports.getMovingList = function(date, callback) {
+  console.log('getMovingList 호출됨\n');
+
+  const moving = db.collection('moving');
+
+  moving.find({ 'date': date }).toArray(
+    function(err, docs) {
+      assert.equal(err, null);
+      console.log('이동 데이터 추출완료!\n');
+      callback(docs);
     }
   );
 }

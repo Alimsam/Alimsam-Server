@@ -1,34 +1,30 @@
 var express = require('express');
 var router = express.Router();
 
-var model = require('../model/DAO');
 var net = require('net');
 
 var server = net.createServer(function(socket) {
-  // socket.on('data', function(data) {  // 소켓에서 새 데이터를 받으면 발생하는 이벤트
-  //     console.log(data.toString());
-  // });
+  console.log('socket connected');
+
+  socket.on('end', function() {
+    console.log('socket disconnected');
+  });
+
+  socket.on('error', function(err) {
+    console.log('socket err: ' + err);
+  })
+
   router.get('/fingerStart', function(req, res, next) {
     const method = req.query.method;
-
     socket.write(method);
+    res.redirect(`/${method}/fingerInputting`);
   });
 
-  router.get('/reinput', function(req, res, next) {
-    /* socket.write('reinput');        // 지문 재 입력 */
-  });
+  router.get('/fail', function(req, res, next) {
+    /* 지문읽기 실패 다시시도 창 띄우기(팝업) */
+  })
 });
 
-router.post('/fingerAdd', function(req, res, next) {
-  const fingerId = req.body.fingerId;
-  const fingerData = req.body.fingerData;
-  /* 이름 입력 화면 렌딩(팝업) */
-  /* const name = inputted name*/
-  const finger = { 'fingerId': fingerId, 'name': '테스트', /* 'name': name */ 'fingerData': fingerData };
-  model.addFinger(finger, function() { });                  // 지문 컬렉션에 이름 및 지문 데이터 추가
-  /* 지문 추가 완료 화면 렌딩 (팝업) */
-  res.redirect('/');
-});
 
 server.listen(3300, function() {
   console.log('socket server listening\n');
