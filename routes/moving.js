@@ -3,8 +3,10 @@ var router = express.Router();
 
 var model = require('../model/DAO');
 
-router.get('/fingerStart', function(req, res, next) {
-  res.redirect('/finger/fingerStart?method=moving')
+router.options('/fingerStart', function(req, res, next) {
+  const place = req.query.place;
+
+  res.redirect(`/finger/fingerStart?method=moving&place=${place}`)
 });
 
 router.post('/fingerSuccess', function(req, res, next) {

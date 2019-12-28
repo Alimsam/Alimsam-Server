@@ -7,12 +7,11 @@ moment.tz.setDefault("Asia/Seoul");
 
 var model = require('../model/DAO');
 
-router.get('/fingerStart', function(req, res, next) {
-  const place = req.query.body;
+router.options('/fingerStart', function(req, res, next) {
   const dayOfWeek = moment().day();
 
   // if(dayOfWeek === 1 || dayOfWeek === 3) {            // 월요일이나 수요일 일 경우
-  res.redirect(`/finger/fingerStart?method=outing&place=${place}`);
+  res.redirect(`/finger/fingerStart?method=outing`);
   // } else {                                            // 외출 신청이 불가능한 요일
     // res.redirect('/outing/unable');
   // }
