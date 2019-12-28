@@ -1,15 +1,15 @@
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
- 
+
+var moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault("Asia/Seoul");
+
 // Connection URL
 const url = 'mongodb://localhost:27017';
 
 // Database Name
 const dbName = 'Alimsam_DB';
-
-var moment = require('moment');
-require('moment-timezone');
-moment.tz.setDefault("Asia/Seoul");
 
 var db;
 // Use connect method to connect to the server
@@ -24,15 +24,15 @@ MongoClient.connect(url, {useUnifiedTopology:true},
 
 
 
-
-
-
+/**
+ * finger DAO
+ */
 exports.addFinger = function(finger, callback) {
   console.log('addFinger 호출됨\n');
-
+  
   const fingerPrint = db.collection('fingerPrint');       // access fingerPirint collection
 
-  fingerPrint.insertMany([{ "fingerId": finger.fingerId, "name": finger.name }], 
+  fingerPrint.insertMany([{ "fingerId": finger.fingerId, "studentId": finger.studentId, "name": finger.name }], 
     function(err, result) {
       assert.equal(err, null);    // err가 null일 경우 pass
       console.log('지문 데이터 추가 완료!\n');
@@ -61,7 +61,50 @@ exports.findFinger = function(fingerId, callback) {    // fingerData Or fingerId
 
 
 
+/**
+ * moving DAO
+ */
+exports.addMoving = function(finger, place, callback) {
+  console.log('addMoving 호출됨\n');
+  
+  const moving = db.collection('moving');
 
+  const date = moment().format('YYYY-MM-DD');
+
+  const movingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'place': place };
+  
+  moving.updateOne({ 'date':  date }, { $push: { 'movingData': movingData }}, { upsert : true }, 
+    function(err, result) {
+      assert.equal(err, null);
+      console.log('이동 데이터 추가 완료\n');
+      callback(result);
+    }
+  );
+}
+
+exports.getMovingList = function(date, callback) {
+  console.log('getMovingList 호출됨\n');
+
+  const moving = db.collection('moving');
+
+  moving.find({ 'date': date }).toArray(
+    function(err, docs) {
+      assert.equal(err, null);
+      console.log('이동 데이터 추출완료!\n');
+      callback(docs);
+    }
+  );
+}
+
+
+
+
+
+
+
+/**
+ * outing DAO
+ */
 
 exports.findIsOuting = function(fingerId, callback) {
   console.log('findIsOuting 호출됨\n');
@@ -136,34 +179,21 @@ exports.getOutingList = function(date, callback) {
 
 
 
-exports.addMoving = function(finger, place, callback) {
-  console.log('addMoving 호출됨\n');
-  
-  const moving = db.collection('moving');
 
-  const date = moment().format('YYYY-MM-DD');
 
-  const movingData = { 'name': finger.name, 'fingerId': finger.fingerId, 'place': place };
-  
-  moving.updateOne({ 'date':  date }, { $push: { 'movingData': movingData }}, { upsert : true }, 
+/**
+ * notice DAO
+ */
+exports.addNotice = function(startDate, endDate, content, callback) {
+  console.log('addNotice 호출됨\n');
+
+  const notice = db.collection('notice');
+
+  notice.insertMany([{ 'startDate':  startDate, 'endDate': endDate, 'content': content }], 
     function(err, result) {
       assert.equal(err, null);
-      console.log('이동 데이터 추가 완료\n');
+      console.log('공지사항 추가 완료');
       callback(result);
     }
-  );
-}
-
-exports.getMovingList = function(date, callback) {
-  console.log('getMovingList 호출됨\n');
-
-  const moving = db.collection('moving');
-
-  moving.find({ 'date': date }).toArray(
-    function(err, docs) {
-      assert.equal(err, null);
-      console.log('이동 데이터 추출완료!\n');
-      callback(docs);
-    }
-  );
+  )
 }

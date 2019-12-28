@@ -10,6 +10,7 @@ var fingerRouter = require('./routes/finger');
 var outRouter = require('./routes/outing');
 var moveRouter = require('./routes/moving');
 var registerRouter = require('./routes/register');
+var noticeRouter = require('./routes/notice');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use('/finger', fingerRouter);
 app.use('/outing', outRouter);
 app.use('/moving', moveRouter);
 app.use('/register', registerRouter);
+app.use('/notice', noticeRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
