@@ -25,16 +25,17 @@ router.post('/fingerSuccess', function(req, res, next) {
 
     model.findFinger(fingerId, function(result) {     // 지문 컬렉션에서 이름 가져오기
       const name = result[0].name;
+      const classInfo = (result[0].studentId).substring(0, 2);
 
-      model.findIsOuting(fingerId, function(result) {           // fingerId를 가진 사람이 외출을 신청했는가?
+      model.findIsOuting(fingerId, classInfo, function(result) {           // fingerId를 가진 사람이 외출을 신청했는가?
         if(result === true) {                                   // 외출 신청을 한 사람이라면
-          model.addBackTime(fingerId, function() {              // 귀가 시간 추가
+          model.addBackTime(fingerId, classInfo, function() {              // 귀가 시간 추가
             res.json({ 'success': fingerSuccess });
           });
         } else if(result === false) {
           const finger = { 'name': name, 'fingerId': fingerId };
 
-          model.addOuting( finger, function(result) {          // 외출 컬렉션에 이름 추가
+          model.addOuting( finger, classInfo, function(result) {          // 외출 컬렉션에 이름 추가
             res.json({ 'success': fingerSuccess });
           });
         }
@@ -47,12 +48,11 @@ router.post('/fingerSuccess', function(req, res, next) {
 
 router.get('/getOutingList', function(req, res, next) {
   const date = req.query.date;
+  const classInfo = req.query.class;
 
-  model.getOutingList(date, 
+  model.getOutingList(date, classInfo,
     function(result) {
-      const outingList = result[0].outingData;
-
-      res.json(outingList);
+      res.json(result);
     }
   );
 });
