@@ -7,7 +7,7 @@ moment.tz.setDefault("Asia/Seoul");
 
 var model = require('../model/DAO');
 
-router.options('/fingerStart', function(req, res, next) {
+router.get('/fingerStart', function(req, res, next) {
   const dayOfWeek = moment().day();
 
   // if(dayOfWeek === 1 || dayOfWeek === 3) {            // 월요일이나 수요일 일 경우

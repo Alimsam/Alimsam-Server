@@ -3,7 +3,7 @@ var router = express.Router();
 
 var model = require('../model/DAO');
 
-router.options('/fingerStart', function(req, res, next) {
+router.get('/fingerStart', function(req, res, next) {
     if(req.query.res === undefined) {
         const name = req.query.name;
         const studentId = req.query.studentId;

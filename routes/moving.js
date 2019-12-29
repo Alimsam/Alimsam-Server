@@ -3,7 +3,7 @@ var router = express.Router();
 
 var model = require('../model/DAO');
 
-router.options('/fingerStart', function(req, res, next) {
+router.get('/fingerStart', function(req, res, next) {
   const place = req.query.place;
 
   res.redirect(`/finger/fingerStart?method=moving&place=${place}`)
