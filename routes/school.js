@@ -3,12 +3,7 @@ var router = express.Router();
 
 var schoolInfo = require('../model/schoolInfo');
 
-router.get('/', function(req, res, next) {
-  res.send('Hello World');
-})
-
-router.get('/meal', function(req, res, next) {
-  console.log('GET /meal');
+router.options('/meal', function(req, res, next) {
   const year = String(req.query.year);
   const month = String(req.query.month);
   schoolInfo.getMeal(year, month, function(meal) {
@@ -16,8 +11,7 @@ router.get('/meal', function(req, res, next) {
   });
 });
 
-router.get('/calendar', function(req, res, next) {
-  console.log('GET /calendar');
+router.options('/calendar', function(req, res, next) {
   const year = String(req.query.year);
   const month = String(req.query.month);
   schoolInfo.getCalendar(year, month, function(calendar) {
