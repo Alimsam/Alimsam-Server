@@ -2,32 +2,35 @@ var express = require('express');
 var router = express.Router();
 
 var model = require('../model/DAO');
+var socket = require('../socketServer');
 
 router.get('/fingerStart', function(req, res, next) {
   const place = req.query.place;
 
-  res.redirect(`/finger/fingerStart?method=moving&place=${place}`)
-});
+  const sendData = "moving" + "," + place;
 
-router.post('/fingerSuccess', function(req, res, next) {
-  const fingerSuccess = req.body.fingerSuccess
+  socket.fingerStart(sendData, function(recvData) {
+    console.log('지문 데이터를 받음');
 
-  if(fingerSuccess == 'true') {
-    const fingerId = req.body.fingerId;
-    const place = req.body.place;
+    const fingerSuccess = recvData.fingerSuccess;
 
-    model.findFinger(fingerId, function(result) {     // 지문 컬렉션에서 이름 가져오기
-      const name = result[0].name;
-      const classInfo = (result[0].studentId).substring(0, 2);
-      const finger = { 'fingerId': fingerId, 'name': name };
+    if(fingerSuccess == 'true') {
+        const fingerId = recvData.fingerId;
 
-      model.addMoving( finger, place, classInfo, function(result) {        // 외출 컬렉션에 이름 추가
-        res.json({ 'success': fingerSuccess });
-      });
-    });
-  } else {
-    res.json({ 'success': fingerSuccess });
-  }
+        model.findFinger(fingerId, function(result) {     // 지문 컬렉션에서 이름 가져오기
+          const name = result[0].name;
+          const classInfo = (result[0].studentId).substring(0, 2);
+
+          const finger = { 'fingerId': fingerId, 'name': name };
+
+          model.addMoving( finger, place, classInfo, function(result) {        // 외출 컬렉션에 이름 추가
+            res.send(fingerSuccess);    
+          });
+        });
+    } else {
+        res.send(fingerSuccess);
+    }
+  });
 });
 
 router.get('/getMovingList', function(req, res, next) {

@@ -94,7 +94,11 @@ exports.getMovingList = function(date, classInfo, callback) {
     function(err, docs) {
       assert.equal(err, null);
       console.log('이동 데이터 추출완료!\n');
-      callback(docs[0][movingData]);
+      if(docs[0] === undefined) {
+        callback(docs)
+      } else {
+        callback(docs[0][movingData]);
+      }
     }
   );
 }
@@ -180,7 +184,11 @@ exports.getOutingList = function(date, classInfo, callback) {
     function(err, docs) {
       assert.equal(err, null);
       console.log('외출 데이터 추출완료!\n');
-      callback(docs[0][outingData]);
+      if(docs[0] === undefined) {
+        callback(docs)
+      } else {
+        callback(docs[0][outingData]);
+      }
     }
   );
 }
@@ -225,7 +233,28 @@ exports.getNoticeList = function(startMonth, classInfo, callback) {
     function(err, docs) {
       assert.equal(err, null);
       console.log('공지사항 데이터 추출완료!\n');
-      callback(docs[0][noticeData]);
+      if(docs[0] === undefined) {
+        callback(docs)
+      } else {
+        callback(docs[0][noticeData]);
+      }
+    }
+  );
+}
+
+exports.deleteNotice = function(startDate, endDate, content, classInfo, callback) {
+  console.log('deleteNotice 호출됨\n');
+
+  const notice = db.collection('notice');
+  const startMonth = moment(startDate).format('YYYY-MM');
+
+  classInfo = 'noticeData_' + classInfo;
+  
+  notice.updateOne({ 'startMonth': startMonth },  {$pull: {[classInfo]: {'startDate': startDate, 'endDate': endDate, 'content': content} }}, 
+    function(err, result) {
+      assert.equal(err, null);
+      console.log('공지사항 삭제 완료\n');
+      callback(result);
     }
   );
 }

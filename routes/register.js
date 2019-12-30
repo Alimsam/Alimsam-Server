@@ -2,32 +2,33 @@ var express = require('express');
 var router = express.Router();
 
 var model = require('../model/DAO');
+var socket = require('../socketServer');
 
 router.get('/fingerStart', function(req, res, next) {
-    if(req.query.res === undefined) {
-        const name = req.query.name;
-        const studentId = req.query.studentId;
+    const name = req.query.name;
+    const studentId = req.query.studentID;
 
-        res.redirect(`/finger/fingerStart?method=register&name=${name}&studentId=${studentId}`);
-    }
-});
+    const sendData = "register" + "," + name + "," + studentId;
 
-router.post('/fingerSuccess', function(req, res, next) {
-    const fingerSuccess = req.body.fingerSuccess;
+    socket.fingerStart(sendData, function(recvData) {
+        console.log('지문 데이터를 받음');
 
-    if(fingerSuccess == 'true') {
-        const fingerId = req.body.fingerId;
-        const studentId = req.body.studentId;
-        const name = req.body.name;
+        const fingerSuccess = recvData.fingerSuccess;
 
-        const finger = { 'fingerId': fingerId, 'studentId': studentId , 'name': name };
+        if(fingerSuccess == 'true') {
+            const fingerId = recvData.fingerId;
+            const studentId = recvData.studentId;
+            const name = recvData.name;
 
-        model.addFinger(finger, function(result) {                // 지문 컬렉션에 이름 및 지문 데이터 추가
-            res.send(fingerSuccess);    
-        });
-    } else {
-        res.send(fingerSuccess);
-    }
+            const finger = { 'fingerId': fingerId, 'studentId': studentId , 'name': name };
+
+            model.addFinger(finger, function(result) {                // 지문 컬렉션에 이름 및 지문 데이터 추가
+                res.send(fingerSuccess);    
+            });
+        } else {
+            res.send(fingerSuccess);
+        }
+    });
 });
 
 module.exports = router;

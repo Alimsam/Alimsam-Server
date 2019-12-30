@@ -27,4 +27,17 @@ router.get('/getNotice', function(req, res, next) {
     );
 });
 
+router.get('/deleteNotice', function(req, res, next) {
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+    const content = req.query.content;
+    const classInfo = req.query.class;
+    
+    model.deleteNotice(startDate, endDate, content, classInfo, 
+        function(result) {
+            res.json(result);
+        }
+    )
+});
+
 module.exports = router;

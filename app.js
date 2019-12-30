@@ -7,7 +7,6 @@ var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var schoolRouter = require('./routes/school');
-var fingerRouter = require('./routes/finger');
 var outRouter = require('./routes/outing');
 var moveRouter = require('./routes/moving');
 var registerRouter = require('./routes/register');
@@ -28,7 +27,6 @@ app.use(cors());
 
 app.use('/', indexRouter);
 app.use('/school', schoolRouter);
-app.use('/finger', fingerRouter);
 app.use('/outing', outRouter);
 app.use('/moving', moveRouter);
 app.use('/register', registerRouter);
