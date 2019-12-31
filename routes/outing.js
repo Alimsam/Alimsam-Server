@@ -10,9 +10,10 @@ var socket = require('../socketServer');
 
 router.get('/fingerStart', function(req, res, next) {
   const dayOfWeek = moment().day();
+  // console.log(dayOfWeek);
 
   // if(dayOfWeek === 1 || dayOfWeek === 3) {            // 월요일이나 수요일 일 경우
-    const sendData = "outing";
+    const sendData = 'outing';
 
     socket.fingerStart(sendData, function(recvData) {
       console.log('지문 데이터를 받음');
@@ -29,13 +30,13 @@ router.get('/fingerStart', function(req, res, next) {
             model.findIsOuting(fingerId, classInfo, function(result) {           // fingerId를 가진 사람이 외출을 신청했는가?
               if(result === true) {                                              // 외출 신청을 한 사람이라면
                 model.addBackTime(fingerId, classInfo, function() {              // 귀가 시간 추가
-                  res.send(fingerSuccess);
+                  res.send('back');
                 });
               } else if(result === false) {
                 const finger = { 'name': name, 'fingerId': fingerId };
       
                 model.addOuting(finger, classInfo, function(result) {            // 외출 컬렉션에 이름 추가
-                  res.send(fingerSuccess);
+                  res.send('out');
                 });
               }
             });

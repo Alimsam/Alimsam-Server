@@ -14,8 +14,8 @@ router.get('/fingerStart', function(req, res, next) {
         console.log('지문 데이터를 받음');
 
         const fingerSuccess = recvData.fingerSuccess;
-
-        if(fingerSuccess == 'true') {
+1
+        if(fingerSuccess === 'true') {
             const fingerId = recvData.fingerId;
             const studentId = recvData.studentId;
             const name = recvData.name;
