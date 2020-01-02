@@ -35,6 +35,7 @@ exports.fingerStart = function(data, callback) {
       // string to json
       var jsonData = new Object();
       data = String(data).split(',');
+      
       for(i in data) {
         splitData = String(data[i]).split(':');
         jsonData[splitData[0]] = splitData[1];
