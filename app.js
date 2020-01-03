@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 
-var indexRouter = require('./routes/index');
 var schoolRouter = require('./routes/school');
 var outRouter = require('./routes/outing');
 var moveRouter = require('./routes/moving');
@@ -25,7 +24,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/', indexRouter);
 app.use('/school', schoolRouter);
 app.use('/outing', outRouter);
 app.use('/moving', moveRouter);

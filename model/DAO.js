@@ -157,6 +157,9 @@ exports.getMovingList = function(date, classInfo, callback) {
       if(docs[0] === undefined) {                   // 이동 데이터가 비어있다.
         callback(docs)
       } else {
+        docs[0][classInfo].sort(function (a, b) { 
+          return a.studentId < b.studentId ? -1 : 1;  
+        });
         callback(docs[0][classInfo]);
       }
     }
@@ -257,13 +260,16 @@ exports.getOutingList = function(date, classInfo, callback) {
 
   classInfo = `outingData_${classInfo}`;
 
-  outing.find({ 'date': date }, { projection:{ [classInfo]: 1, _id: 0 } }).sort({ 'studentId': 1 }).toArray(
+  outing.find({ 'date': date }, { projection:{ [classInfo]: 1, _id: 0 } }).toArray(
     function(err, docs) {
       assert.equal(err, null);
       console.log('외출 데이터 추출완료!\n');
       if(docs[0] === undefined) {                   // 외출 데이터가 비어있다.
         callback(docs)
       } else {
+        docs[0][classInfo].sort(function (a, b) { 
+          return a.studentId < b.studentId ? -1 : 1;  
+        });        
         callback(docs[0][classInfo]);
       }
     }
