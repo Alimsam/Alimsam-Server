@@ -8,8 +8,8 @@ router.get('/fingerStart', function(req, res, next) {
   const place = req.query.place;
 
   socket.fingerStart('moving', function(recvData) {
-    console.log('지문 데이터를 받음');
-
+    console.log('지문 데이터를 받음\n');
+    
     const fingerSuccess = recvData.fingerSuccess;
 
     if(fingerSuccess == 'true') {
@@ -20,18 +20,16 @@ router.get('/fingerStart', function(req, res, next) {
           const studentId = result[0].studentId;
           const classInfo = studentId.substring(0, 2);
 
-          model.findIsMoving(fingerId, classInfo, function(result) {            // 외출중인지 확인
-            if(result === 'notBack') {                                          // 현재 이동중인 상태
-              model.addIsBack(fingerId, classInfo, function(result) {
+          model.findIsMoving(fingerId, classInfo, function(result) {            // 이동중인지 확인
+            if(result === true) {                                               // 이동중인 상태
+              model.deleteExistMoving(fingerId, classInfo, function(result) {
                 res.send('back');
+                // res.send({ 'name': name, 'result': 'back' });
               });
-            } else if(result === 'back') {                                       // 이동 후 복귀 한 상태    
-              model.addMoreMoving(fnigerId, place, classInfo, function(result) {
-                res.send('move');
-              });
-            } else if(result === false) {                                        // 이동 신청을 하지 않은 상태
-              model.addMoving(fingerId, studentId, name, place, function(result) {        // 외출 컬렉션에 이름 추가
-                res.send('move');
+            } else if(result === false) {                                                            // 이동 신청을 하지 않은 상태
+              model.addMoving(fingerId, studentId, name, place, classInfo, function(result) {        // 외출 컬렉션에 이름 추가
+                res.send('true');
+                // res.send({ 'name': name, 'result': 'true' });
               });
             }
           });

@@ -12,6 +12,11 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'Alimsam_DB';
 
 var db;
+var moving;
+var fingerPrint;
+var outing;
+var notice;
+
 // Use connect method to connect to the server
 MongoClient.connect(url, {useUnifiedTopology:true}, 
   function(err, client) {
@@ -19,15 +24,15 @@ MongoClient.connect(url, {useUnifiedTopology:true},
     console.log('DataBase Connected successfully to server\n');
 
     db = client.db(dbName);
+    
+    moving = db.collection('moving');
+    fingerPrint = db.collection('fingerPrint');
+    outing = db.collection('outing');
+    notice = db.collection('notice');
   }
 );
 
 
-
-const moving = db.collection('moving');
-const fingerPrint = db.collection('fingerPrint');
-const outing = db.collection('outing');
-const notice = db.collection('notice');
 
 
 
@@ -92,17 +97,15 @@ exports.findIsMoving = function(fingerId, classInfo, callback) {
   const date = moment().format('YYYY-MM-DD');
   classInfo = `movingData_${classInfo}`;
 
-  moving.find({ 'date': date, [`${classInfo}.fingerId`]: fingerId }).toArray(
+  moving.find({ 'date': date }, { projection: { [classInfo]: { $elemMatch: { 'fingerId': fingerId } }, '_id': false } } ).toArray(
     function(err, docs) {
       assert.equal(err, null);
-      console.log('이동 유무 확인 완료');
+      console.log('이동 유무 확인 완료\n');
 
-      if(docs.length < 0) {                           // 이동을 안한 경우
+      if(docs.length <= 0 || docs[0][classInfo] === undefined) {                           // 이동을 안한 경우
         callback(false);
-      } else if(docs[0].isBack === true) {            // 복귀를 한 경우
-        callback('back');
-      } else if(docs[0].isBack === false) {           // 복귀를 안한 경우
-        callback('notBack');
+      } else {
+        callback(true);
       }
     }
   );
@@ -126,30 +129,14 @@ exports.addMoving = function(fingerId, studentId, name, place, classInfo, callba
   );
 }
 
-exports.addMoreMoving = function(fingerId, place, classInfo, callback) {
-  console.log('addMoreMoving 호출됨\n');
+exports.deleteExistMoving = function(fingerId, classInfo, callback) {
+  console.log('deleteExistMoving 호출됨\n');
 
   const date = moment().format('YYYY-MM-DD');
 
   classInfo = 'movingData_' + classInfo;
 
-  moving.updateOne({ 'date': date, [`${classInfo}.fingerId`]: fingerId }, {$set: { [`${classInfo}.$.place`]: place }}, 
-    function(err, result) {
-      assert.equal(err, null);
-      console.log('이동 데이터 갱신 완료\n');
-      callback(result);
-    }
-  );
-}
-
-exports.addIsBack = function(fingerId, classInfo, callback) {
-  console.log('addIsBack 호출됨\n');
-
-  const date = moment().format('YYYY-MM-DD');
-
-  classInfo = 'movingData_' + classInfo;
-
-  moving.updateOne({ 'date': date, [`${classInfo}.fingerId`]: fingerId }, {$set: {[`${classInfo}.$.isBack`]: true } },
+  moving.updateOne({'date': date}, { $pull : { [classInfo]: { 'fingerId': fingerId } } }, {multi: true}, 
     function(err, result) {
       assert.equal(err, null);
       console.log('이동 복귀 완료\n');
@@ -194,16 +181,18 @@ exports.findIsOuting = function(fingerId, classInfo, callback) {
   const date = moment().format('YYYY-MM-DD');
   classInfo = 'outingData_' + classInfo;
 
-  outing.find({ 'date': date, [`${classInfo}.fingerId`]: fingerId }).toArray(
+  outing.find({ 'date': date }, { projection: { [classInfo]: { $elemMatch: { 'fingerId': fingerId } }, '_id': false } } ).toArray(
     function(err, docs) {
       assert.equal(err, null);
       console.log('외출 유무 확인 완료!\n');
 
-      if(docs.length < 0) {                           // 이동을 안한 경우
+      // console.log(docs.length);
+
+      if(docs.length <= 0 || !Object.keys(docs[0]).length) {        // 외출을 안한 경우
         callback(false);
-      } else if(docs[0].backTime !== '') {            // 복귀를 한 경우
+      } else if(docs[0][classInfo][0].backTime !== '') {            // 복귀를 한 경우
         callback('back');
-      } else if(docs[0].backTime === '') {            // 복귀를 안한 경우
+      } else if(docs[0][classInfo][0].backTime === '') {            // 복귀를 안한 경우
         callback('notBack');
       }
     }
@@ -214,7 +203,7 @@ exports.addOuting = function(fingerId, studentId, name, classInfo, callback) {
   console.log('addOuting 호출됨\n');
   
   const date = moment().format('YYYY-MM-DD');
-  const outTime = moment().format('hh:mm');
+  const outTime = moment().format('HH:mm');
   
   classInfo = 'outingData_' + classInfo;
   
@@ -229,15 +218,32 @@ exports.addOuting = function(fingerId, studentId, name, classInfo, callback) {
   );
 }
 
+exports.reOuting = function(fingerId, classInfo, callback) {
+  console.log('deleteBackTime 호출됨\n');
+
+  const date = moment().format('YYYY-MM-DD');
+  const outTime = moment().format('HH:mm');
+
+  classInfo = 'outingData_' + classInfo;
+  
+  outing.updateOne({ 'date': date, [`${classInfo}.fingerId`]: fingerId }, { $set: { [`${classInfo}.$.outTime`]: outTime, [`${classInfo}.$.backTime`]: '' } }, 
+    function(err, result) {
+      assert.equal(err, null);
+      console.log('재외출 신청 완료\n');
+      callback(result);
+    }
+  );
+}
+
 exports.addBackTime = function(fingerId, classInfo, callback) {
   console.log('addBackTime 호출됨\n');
   
   const date = moment().format('YYYY-MM-DD');
-  const backTime = moment().format('hh:mm');
+  const backTime = moment().format('HH:mm');
   
   classInfo = 'outingData_' + classInfo;
 
-  outing.updateOne({ 'date': date, [`${classInfo}.fingerId`]: fingerId }, {$set: {[`${classInfo}.$.backTime`]: backTime } }, 
+  outing.updateOne({ 'date': date, [`${classInfo}.fingerId`]: fingerId }, { $set: {[`${classInfo}.$.backTime`]: backTime } }, 
     function(err, result) {
       assert.equal(err, null);
       console.log('귀가 시간 추가 완료\n');
@@ -287,7 +293,7 @@ exports.addNotice = function(startDate, endDate, content, classInfo, callback) {
   notice.updateOne({ 'startMonth':  startMonth }, { $push: { [classInfo]: noticeData }}, { upsert : true }, 
     function(err, result) {
       assert.equal(err, null);
-      console.log('공지사항 추가 완료');
+      console.log(`${classInfo} 공지사항 추가 완료`);
       callback(result);
     }
   );
@@ -301,7 +307,7 @@ exports.getNoticeList = function(startMonth, classInfo, callback) {
   notice.find({ 'startMonth': startMonth }, { projection:{ [classInfo]: 1, _id: 0 } }).toArray(
     function(err, docs) {
       assert.equal(err, null);
-      console.log('공지사항 데이터 추출완료!\n');
+      console.log(`${classInfo} 공지사항 데이터 추출완료!\n`);
       if(docs[0] === undefined) {
         callback(docs)
       } else {
@@ -318,7 +324,7 @@ exports.deleteNotice = function(startDate, endDate, content, classInfo, callback
 
   classInfo = 'noticeData_' + classInfo;
   
-  notice.updateOne({ 'startMonth': startMonth },  {$pull: {[classInfo]: {'startDate': startDate, 'endDate': endDate, 'content': content} }}, 
+  notice.updateOne({ 'startMonth': startMonth },  {$pull: {[classInfo]: {'startDate': startDate, 'endDate': endDate, 'content': content } } }, 
     function(err, result) {
       assert.equal(err, null);
       console.log('공지사항 삭제 완료\n');
