@@ -117,6 +117,7 @@ exports.addMoving = function(fingerId, studentId, name, place, classInfo, callba
   const date = moment().format('YYYY-MM-DD');
   
   classInfo = 'movingData_' + classInfo;
+  studentId = studentId.substring(2, 4);
 
   const movingData = { 'studentId': studentId, 'name': name, 'fingerId': fingerId, 'place': place };
 
@@ -150,7 +151,7 @@ exports.getMovingList = function(date, classInfo, callback) {
 
   classInfo = `movingData_${classInfo}`;
 
-  moving.find({ 'date': date }, { projection:{ [classInfo]: 1, _id: 0 } }).sort({ 'studentId': 1 }).toArray(                // 해당 날짜의 document에서 movingData List만 추출함
+  moving.find({ 'date': date }, { projection:{ [classInfo]: 1, _id: 0 } }).toArray(                // 해당 날짜의 document에서 movingData List만 추출함
     function(err, docs) {
       assert.equal(err, null);
       console.log('이동 데이터 추출완료!\n');
@@ -209,6 +210,8 @@ exports.addOuting = function(fingerId, studentId, name, classInfo, callback) {
   const outTime = moment().format('HH:mm');
   
   classInfo = 'outingData_' + classInfo;
+
+  studentId = studentId.substring(2, 4);
   
   const outingData = { 'studentId': studentId, 'name': name, 'fingerId': fingerId, 'outTime': outTime, 'backTime': '' };
   
