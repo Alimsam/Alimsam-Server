@@ -29,8 +29,6 @@ exports.fingerStart = function(data, callback) {
 
     socket.on('data', function(data) {
       console.log('get Data from client');
-
-      console.log('data: ' + data);
       
       // string to json
       var jsonData = new Object();

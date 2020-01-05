@@ -24,8 +24,8 @@ router.get('/fingerStart', function(req, res, next) {
                         const finger = { 'fingerId': fingerId, 'studentId': studentId , 'name': name };
 
                         model.addFinger(finger, function(result) {                // 지문 컬렉션에 이름 및 지문 데이터 추가
-                            res.send('true');
-                            // res.send({ 'name': name, 'result': 'true' });
+                            // res.send('true');
+                            res.send({ 'name': name, 'result': 'true' });
                         });
                     } else {
                         res.send('false');                                        // 지문 등록에 실패한 경우

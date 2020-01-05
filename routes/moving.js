@@ -23,13 +23,13 @@ router.get('/fingerStart', function(req, res, next) {
           model.findIsMoving(fingerId, classInfo, function(result) {            // 이동중인지 확인
             if(result === true) {                                               // 이동중인 상태
               model.deleteExistMoving(fingerId, classInfo, function(result) {
-                res.send('back');
-                // res.send({ 'name': name, 'result': 'back' });
+                // res.send('back');
+                res.send({ 'name': name, 'result': 'back' });
               });
             } else if(result === false) {                                                            // 이동 신청을 하지 않은 상태
               model.addMoving(fingerId, studentId, name, place, classInfo, function(result) {        // 외출 컬렉션에 이름 추가
-                res.send('true');
-                // res.send({ 'name': name, 'result': 'true' });
+                // res.send('true');
+                res.send({ 'name': name, 'result': 'true' });
               });
             }
           });
