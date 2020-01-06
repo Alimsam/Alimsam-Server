@@ -19,7 +19,7 @@ router.get('/fingerStart', function(req, res, next) {
                     const fingerSuccess = recvData.fingerSuccess;                             // 지문 읽기 성공 여부
 
                     if(fingerSuccess === 'true') {
-                        const fingerId = recvData.fingerId;
+                        const fingerId = recvData.fingerId;5
                         
                         const finger = { 'fingerId': fingerId, 'studentId': studentId , 'name': name };
 
@@ -27,8 +27,10 @@ router.get('/fingerStart', function(req, res, next) {
                             // res.send('true');
                             res.send({ 'name': name, 'result': 'true' });
                         });
-                    } else {
-                        res.send('false');                                        // 지문 등록에 실패한 경우
+                    } else if(fingerSuccess === 'false') {                                        // 지문 등록에 실패한 경우
+                        res.send('false');
+                    } else if(fingerSuccess === 'already') {                                      // 지문이 이미 등록 되어 있는 경우
+                        res.send('already');
                     }
                 });
             }
