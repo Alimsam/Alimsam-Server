@@ -75,14 +75,15 @@ router.get('/prohibitOuting', function(req, res, next) {
 
   model.findFingerByStudentId(studentId, function(docs) {
     const curProhibit = docs[0].prohibit;
+    const name = docs[0].name;
 
     model.prohibitOuting(studentId, curProhibit,
       function(result) {
         if(result.result.nModified > 0) {
           if(curProhibit === true) {                          // 현재 외출 불가능한 상태(외출 금지 취소)
-            res.send('permit');
-          } else if(curProhibit === false) {                // 현재 외출 가능한 상태(외출 금지 신청)
-            res.send('prohibit');
+            res.send({ 'name': name, 'result': 'permit' });
+          } else if(curProhibit === false) {                  // 현재 외출 가능한 상태(외출 금지 신청)
+            res.send({ 'name': name, 'result': 'prohibit' });
           }
         } else {
           res.send('false');
