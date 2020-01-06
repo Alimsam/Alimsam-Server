@@ -63,6 +63,18 @@ exports.findFinger = function(fingerId, callback) {    // fingerData Or fingerId
   );
 }
 
+exports.findFingerByStudentId = function(studentId, callback) {
+  console.log('findFinger 호출됨\n');
+
+  fingerPrint.find({ 'studentId': studentId }).toArray(
+    function(err, docs) {
+      assert.equal(err, null);
+      console.log('유저 탐색 성공!\n');
+      callback(docs);     // 해당 지문 유저의 이름 callback
+    }
+  );
+}
+
 exports.existFinger = function(studentId, callback) {
   console.log('existFinger 호출됨\n');
 
@@ -279,13 +291,13 @@ exports.getOutingList = function(date, classInfo, callback) {
   );
 }
 
-exports.prohibitOuting = function(studentId, callback) {
+exports.prohibitOuting = function(studentId, curProhibit, callback) {
   console.log('prohibitOuting 호출됨\n');
 
-  fingerPrint.update({ 'studentId': studentId }, { $set: { prohibit: true } },
+  fingerPrint.update({ 'studentId': studentId }, { $set: { prohibit: !curProhibit } },
     function(err, result) {
       assert.equal(err, null);
-      console.log('외출 금지 적용됨\n');
+      console.log('외출 금지 풀림\n');
       callback(result);
     } 
   );

@@ -63,8 +63,7 @@ router.get('/getOutingList', function(req, res, next) {
   const date = req.query.date;
   const classInfo = req.query.class;
 
-  model.getOutingList(date, classInfo,
-    function(result) {
+  model.getOutingList(date, classInfo, function(result) {
         res.json(result);           // 외출 신청한 학생 목록을 넘겨줌  
     }
   );
@@ -74,11 +73,23 @@ router.get('/getOutingList', function(req, res, next) {
 router.get('/prohibitOuting', function(req, res, next) {
   const studentId = req.query.studentID;
 
-  model.prohibitOuting(studentId, 
-    function(result) {
-      res.send('true');
-    }
-  );
+  model.findFingerByStudentId(studentId, function(docs) {
+    const curProhibit = docs[0].prohibit;
+
+    model.prohibitOuting(studentId, curProhibit,
+      function(result) {
+        if(result.result.nModified > 0) {
+          if(curProhibit === true) {                          // 현재 외출 불가능한 상태(외출 금지 취소)
+            res.send('permit');
+          } else if(curProhibit === false) {                // 현재 외출 가능한 상태(외출 금지 신청)
+            res.send('prohibit');
+          }
+        } else {
+          res.send('false');
+        }
+      }
+    );
+  });
 })
 
 module.exports = router;
