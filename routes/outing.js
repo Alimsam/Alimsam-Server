@@ -22,25 +22,30 @@ router.get('/fingerStart', function(req, res, next) {
             const fingerId = recvData.fingerId;
 
             model.findFinger(fingerId, function(result) {     // 지문 컬렉션에서 이름 가져오기
-              const name = result[0].name;
-              const studentId = result[0].studentId;
-              const classInfo = studentId.substring(0, 2);
-        
-              model.findIsOuting(fingerId, classInfo, function(result) {           // fingerId를 가진 사람이 외출을 신청했는가?
-                if(result === 'notBack') {                                         // 현재 외출 중인 상태
-                  model.addBackTime(fingerId, classInfo, function() {              // 귀가 시간 추가
-                    res.send({ 'name': name, 'result': 'back' });
-                  });
-                } else if(result === 'back') {                                     // 외출 후 복귀 한 상태
-                  model.reOuting(fingerId, classInfo, function(result) {
-                    res.send({ 'name': name, 'result': 'out' });
-                  });
-                } else if(result === false) {                                      // 외출 신청을 안한 상태
-                  model.addOuting(fingerId, studentId, name, classInfo, function(result) {            // 외출 컬렉션에 이름 추가
-                    res.send({ 'name': name, 'result': 'out' });
-                  });
-                }
-              });
+              const isProhibit = result[0].prohibit;
+              if(isProhibit === true) {                       // 외출 금지를 당한 상태
+                res.send('unable');
+              } else {
+                const name = result[0].name;
+                const studentId = result[0].studentId;
+                const classInfo = studentId.substring(0, 2);
+          
+                model.findIsOuting(fingerId, classInfo, function(result) {           // fingerId를 가진 사람이 외출을 신청했는가?
+                  if(result === 'notBack') {                                         // 현재 외출 중인 상태
+                    model.addBackTime(fingerId, classInfo, function() {              // 귀가 시간 추가
+                      res.send({ 'name': name, 'result': 'back' });
+                    });
+                  } else if(result === 'back') {                                     // 외출 후 복귀 한 상태
+                    model.reOuting(fingerId, classInfo, function(result) {
+                      res.send({ 'name': name, 'result': 'out' });
+                    });
+                  } else if(result === false) {                                      // 외출 신청을 안한 상태
+                    model.addOuting(fingerId, studentId, name, classInfo, function(result) {            // 외출 컬렉션에 이름 추가
+                      res.send({ 'name': name, 'result': 'out' });
+                    });
+                  }
+                });
+              }
             });
         } else {                                     // 지문 인식에 실패했을 경우
             res.send('false');

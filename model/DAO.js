@@ -42,7 +42,7 @@ MongoClient.connect(url, {useUnifiedTopology:true},
 exports.addFinger = function(finger, callback) {
   console.log('addFinger 호출됨\n');
   
-  fingerPrint.insertMany([{ 'fingerId': finger.fingerId, 'studentId': finger.studentId, 'name': finger.name }], 
+  fingerPrint.insertMany([{ 'fingerId': finger.fingerId, 'studentId': finger.studentId, 'name': finger.name, 'prohibit': false }], 
     function(err, result) {
       assert.equal(err, null);                          // err가 null일 경우 pass
       console.log('지문 데이터 추가 완료!\n');
