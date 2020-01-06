@@ -167,7 +167,7 @@ exports.getMovingList = function(date, classInfo, callback) {
     function(err, docs) {
       assert.equal(err, null);
       console.log('이동 데이터 추출완료!\n');
-      if(docs[0] === undefined) {                   // 이동 데이터가 비어있다.
+      if(docs[0] === undefined || docs[0][classInfo] === undefined) {                   // 이동 데이터가 비어있다.
         callback(docs)
       } else {
         docs[0][classInfo].sort(function (a, b) { 
@@ -279,7 +279,7 @@ exports.getOutingList = function(date, classInfo, callback) {
     function(err, docs) {
       assert.equal(err, null);
       console.log('외출 데이터 추출완료!\n');
-      if(docs[0] === undefined) {                   // 외출 데이터가 비어있다.
+      if(docs[0] === undefined || docs[0][classInfo] === undefined) {                   // 외출 데이터가 비어있다.
         callback(docs)
       } else {
         docs[0][classInfo].sort(function (a, b) { 
