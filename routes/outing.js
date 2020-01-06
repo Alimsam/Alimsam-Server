@@ -29,17 +29,14 @@ router.get('/fingerStart', function(req, res, next) {
               model.findIsOuting(fingerId, classInfo, function(result) {           // fingerId를 가진 사람이 외출을 신청했는가?
                 if(result === 'notBack') {                                         // 현재 외출 중인 상태
                   model.addBackTime(fingerId, classInfo, function() {              // 귀가 시간 추가
-                    // res.send('back');
                     res.send({ 'name': name, 'result': 'back' });
                   });
                 } else if(result === 'back') {                                     // 외출 후 복귀 한 상태
                   model.reOuting(fingerId, classInfo, function(result) {
-                    // res.send('out');
                     res.send({ 'name': name, 'result': 'out' });
                   });
                 } else if(result === false) {                                      // 외출 신청을 안한 상태
                   model.addOuting(fingerId, studentId, name, classInfo, function(result) {            // 외출 컬렉션에 이름 추가
-                    // res.send('out');
                     res.send({ 'name': name, 'result': 'out' });
                   });
                 }
@@ -67,5 +64,16 @@ router.get('/getOutingList', function(req, res, next) {
     }
   );
 });
+
+
+router.get('/prohibitOuting', function(req, res, next) {
+  const studentId = req.query.studentID;
+
+  model.prohibitOuting(studentId, 
+    function(result) {
+      res.send('true');
+    }
+  );
+})
 
 module.exports = router;

@@ -279,6 +279,17 @@ exports.getOutingList = function(date, classInfo, callback) {
   );
 }
 
+exports.prohibitOuting = function(studentId, callback) {
+  console.log('prohibitOuting 호출됨\n');
+
+  fingerPrint.update({ 'studentId': studentId }, { $set: { prohibit: true } },
+    function(err, result) {
+      assert.equal(err, null);
+      console.log('외출 금지 적용됨\n');
+      callback(result);
+    } 
+  );
+}
 
 
 
