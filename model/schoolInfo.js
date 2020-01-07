@@ -54,7 +54,7 @@ exports.getMeal = async function(year, month, callback) {
 
 exports.getCalendar = async function(year, month, callback) {
     console.log('getCalendar 호출됨');
-    const calendar = await school.getCalendar(year, month);
+    const calendar = await school.getCalendar('2019', '12');
     const lastDate = (new Date(year, month, 0)).getDate();      // 해당 달의 마지막날 구하기
 
     for(let date=1; date<=lastDate; date++) {

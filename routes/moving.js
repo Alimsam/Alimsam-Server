@@ -25,10 +25,12 @@ router.get('/fingerStart', function(req, res, next) {
               model.deleteExistMoving(fingerId, classInfo, function(result) {
                 res.send({ 'name': name, 'result': 'back' });
               });
-            } else if(result === false) {                                                            // 이동 신청을 하지 않은 상태
+            } else if(result === false && place !== 'comeback') {                                     // 이동 신청을 하지 않은 상태
               model.addMoving(fingerId, studentId, name, place, classInfo, function(result) {        // 외출 컬렉션에 이름 추가
                 res.send({ 'name': name, 'result': 'true' });
               });
+            } else {
+              res.send('notApply');
             }
           });
         });

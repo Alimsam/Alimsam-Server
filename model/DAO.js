@@ -168,7 +168,7 @@ exports.getMovingList = function(date, classInfo, callback) {
       assert.equal(err, null);
       console.log('이동 데이터 추출완료!\n');
       if(docs[0] === undefined || docs[0][classInfo] === undefined) {                   // 이동 데이터가 비어있다.
-        callback('noData')
+        callback('noData');
       } else {
         docs[0][classInfo].sort(function (a, b) { 
           return a.studentId < b.studentId ? -1 : 1;  
