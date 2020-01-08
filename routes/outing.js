@@ -37,7 +37,7 @@ router.get('/fingerStart', function(req, res, next) {
                     });
                   } else if(result === 'back') {                                     // 외출 후 복귀 한 상태
                     model.reOuting(fingerId, classInfo, function(result) {
-                      res.send({ 'name': name, 'result': 'out' });
+                      res.send({ 'name': name, 'result': 'reOuting' });
                     });
                   } else if(result === false) {                                      // 외출 신청을 안한 상태
                     model.addOuting(fingerId, studentId, name, classInfo, function(result) {            // 외출 컬렉션에 이름 추가
