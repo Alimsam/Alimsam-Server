@@ -21,15 +21,19 @@ router.get('/fingerStart', function(req, res, next) {
           const classInfo = studentId.substring(0, 2);
 
           model.findIsMoving(fingerId, classInfo, function(result) {            // 이동중인지 확인
-            if(result === true) {                                               // 이동중인 상태
+            if(result === true && place === 'comeback') {                                               // 이동중인 상태에 복귀 신청
               model.deleteExistMoving(fingerId, classInfo, function(result) {
                 res.send({ 'name': name, 'result': 'back' });
               });
-            } else if(result === false && place !== 'comeback') {                                     // 이동 신청을 하지 않은 상태
+            } else if(result === false && place !== 'comeback') {                                     // 이동 신청을 하지 않은 상태에 이동 신청
               model.addMoving(fingerId, studentId, name, place, classInfo, function(result) {        // 외출 컬렉션에 이름 추가
                 res.send({ 'name': name, 'result': 'true' });
               });
-            } else {
+            } else if(result === true && place !== 'comeback') {                                    // 이동중인 상태에서 이동 신청
+              model.reMoving(fingerId, place, function(result) {
+                res.send({ 'name': name, 'result': 'true' });
+              });
+            } else if(result === false && place === 'comeback') {                                    // 이동 신청을 하지 않은 상태에 복귀 신청
               res.send('notApply');
             }
           });

@@ -142,6 +142,22 @@ exports.addMoving = function(fingerId, studentId, name, place, classInfo, callba
   );
 }
 
+exports.reMoving = function(fingerId, place, classInfo, callback) {
+  console.log('reMoving 호출됨\n');
+
+  const date = moment().format('YYYY-MM-DD');
+
+  classInfo = 'movingData_' + classInfo;
+
+  moving.updateOne({ 'date': date, [`${classInfo}.fingerId`]: fingerId }, {$set: { [`${classInfo}.$.place`]: place }}, 
+    function(err, result) {
+      assert.equal(err, null);
+      console.log('재이동 신청 완료\n');
+      callback(result);
+    }
+  );
+}
+
 exports.deleteExistMoving = function(fingerId, classInfo, callback) {
   console.log('deleteExistMoving 호출됨\n');
 
