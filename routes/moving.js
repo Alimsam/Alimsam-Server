@@ -30,7 +30,7 @@ router.get('/fingerStart', function(req, res, next) {
                 res.send({ 'name': name, 'result': 'true' });
               });
             } else if(result === true && place !== 'comeback') {                                    // 이동중인 상태에서 이동 신청
-              model.reMoving(fingerId, place, function(result) {
+              model.reMoving(fingerId, place, classInfo, function(result) {
                 res.send({ 'name': name, 'result': 'reMoving' });
               });
             } else if(result === false && place === 'comeback') {                                    // 이동 신청을 하지 않은 상태에 복귀 신청
